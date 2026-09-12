@@ -9,7 +9,6 @@ function buildBranches(){
   $("branch-cards").innerHTML=ids.map(id=>`
     <article class="panel branch tone-${id}" data-id="${id}">
       <div class="branch-head"><div><span>NODO ${id[0]}</span><h3>RAMA ${id}</h3></div><div class="amp" id="amp-${id}">— A</div></div>
-      <div class="delta" id="delta-${id}">Esperando calibración</div>
       <div class="branch-inputs">
         <label>Corriente objetivo<input id="target-${id}" type="number" min="0.001" step="0.01" value="${defaults[id]}"><em>A</em></label>
         <label>Reóstato Reo${id}<input id="reo-${id}" type="number" min="0" max="10000" step="0.01" value="0"><em>Ω</em></label>
@@ -47,7 +46,7 @@ function solve(){
 function render(){
   const o=state.op,tolerance=Math.max(.01,n("tolerance")||2);let allWithin=true;
   $("live-v-out").textContent=`${fmt(o.V,2)} V`;$("head-current").textContent=`${fmt(o.It)} A`;$("health-dot").className="health-dot ok";
-  ids.forEach(id=>{const target=n(`target-${id}`),delta=o.currents[id]-target,pct=target>0?100*delta/target:NaN,within=Number.isFinite(pct)&&Math.abs(pct)<=tolerance;allWithin&&=within;$(`amp-${id}`).textContent=`${fmt(o.currents[id])} A`;$(`delta-${id}`).textContent=target>0?`${delta>=0?"+":""}${fmt(delta)} A · ${delta>=0?"+":""}${fmt(pct,1)} % del objetivo`:"Sin objetivo";$(`delta-${id}`).className=`delta ${within?"status-ok":"status-warn"}`});
+  ids.forEach(id=>{const target=n(`target-${id}`),delta=o.currents[id]-target,pct=target>0?100*delta/target:NaN,within=Number.isFinite(pct)&&Math.abs(pct)<=tolerance;allWithin&&=within;$(`amp-${id}`).textContent=`${fmt(o.currents[id])} A`});
   $("health-label").textContent=allWithin?"Objetivos cumplidos":"Simulación válida";
   $("res-it").textContent=`${fmt(o.It)} A`;$("res-i2").textContent=`${fmt(o.I2)} A`;$("res-dv1").textContent=`${fmt(o.It*o.Rc1,3)} V`;$("res-dv2").textContent=`${fmt(o.I2*o.Rc2,3)} V`;$("res-ps").textContent=`${fmt(o.pSource,2)} W`;$("res-pe").textContent=`${fmt(o.pError,6)} W`;
   $("results-body").innerHTML=ids.map(id=>{const target=n(`target-${id}`),delta=o.currents[id]-target,pct=target>0?100*delta/target:NaN,power=o.currents[id]**2*o.branch[id];return `<tr><td>I${id}</td><td>${fmt(o.currents[id])} A</td><td>${fmt(target)} A</td><td class="${Math.abs(pct)<=tolerance?"status-ok":"status-warn"}">${Number.isFinite(pct)?fmt(pct,2)+" %":"—"}</td><td>${fmt(state.fixed[id])} Ω</td><td>${fmt(o.rheostats[id])} Ω</td><td>${fmt(power,2)} W</td></tr>`}).join("");

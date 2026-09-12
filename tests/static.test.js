@@ -12,6 +12,7 @@ assert.ok(app.includes('const ids=["11","12","21","22"]'));
 assert.ok(app.includes('id="reo-${id}"'));
 assert.ok(!app.includes("data-set-reo"),"no debe haber botones de valores rápidos");
 assert.ok(!app.includes("reo-range"),"no debe haber reóstatos deslizantes");
+assert.ok(!app.includes("% del objetivo"),"la desviación no debe mostrarse en las tarjetas");
 const manifest=JSON.parse(fs.readFileSync(path.join(root,"manifest.webmanifest"),"utf8"));
 assert.equal(manifest.display,"standalone");
 assert.equal(manifest.start_url,"./");

@@ -26,8 +26,7 @@
   <main>
     <section class="workflow-card" id="calibration">
       <div class="section-title">
-        <div class="step-number">1</div>
-        <div><span>MEDICIONES DE CAMPO</span><h2>Calcular resistencias fijas</h2><p>Valores medidos con los reóstatos en 0 Ω.</p></div>
+        <div><div class="step-label"><span class="step-number">1</span><span>MEDICIONES DE CAMPO</span></div><h2>Calcular resistencias fijas</h2><p>Valores medidos con los reóstatos en 0 Ω.</p></div>
       </div>
       <div class="field-grid calibration-fields">
         <label>Voltaje<input id="nom-v" type="number" min="0.001" step="0.1" value="24"><em>V</em></label>
@@ -54,8 +53,7 @@
     <section class="regulation" id="regulation">
       <div class="regulation-head">
         <div class="section-title">
-          <div class="step-number">2</div>
-          <div><span>REGULACIÓN</span><h2>Ajustar corrientes</h2><p>Escriba el voltaje, la corriente objetivo y cada reóstato.</p></div>
+          <div><div class="step-label"><span class="step-number">2</span><span>REGULACIÓN</span></div><h2>Ajustar corrientes</h2><p>Escriba el voltaje, la corriente objetivo y cada reóstato.</p></div>
         </div>
         <div class="voltage-control"><label>Voltaje de trabajo<input id="live-v" type="number" min="0" max="1000" step="0.1" value="24"><em>V</em></label><output id="live-v-out">24,00 V</output></div>
       </div>

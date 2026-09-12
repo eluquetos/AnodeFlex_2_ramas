@@ -1,0 +1,17 @@
+const assert=require("node:assert/strict");
+const model=require("../dist/model.js");
+const currents={11:1.2,12:1,21:.9,22:.8};
+const nominal=model.dimension({V:24,Rc1:.4,Rc2:.5,currents});
+assert.ok(Math.abs(nominal.V1-22.44)<1e-12);
+assert.ok(Math.abs(nominal.V2-21.59)<1e-12);
+const operating=model.simulate({V:24,Rc1:.4,Rc2:.5,fixed:nominal.fixed,rheostats:{11:0,12:0,21:0,22:0}});
+for(const id of model.IDS)assert.ok(Math.abs(operating.currents[id]-currents[id])<1e-12,`corriente ${id}`);
+assert.ok(Math.abs(operating.It-3.9)<1e-12);
+assert.ok(Math.abs(operating.pError)<1e-10);
+const targets={11:1,12:.8,21:.7,22:.6};
+const adjustment=model.adjust({V:24,Rc1:.4,Rc2:.5,fixed:nominal.fixed,targets,maxReo:100});
+assert.equal(adjustment.feasible,true);
+const adjusted=model.simulate({V:24,Rc1:.4,Rc2:.5,fixed:nominal.fixed,rheostats:adjustment.rheostats});
+for(const id of model.IDS)assert.ok(Math.abs(adjusted.currents[id]-targets[id])<1e-12,`objetivo ${id}`);
+assert.throws(()=>model.dimension({V:1,Rc1:1,Rc2:1,currents}),/voltage-exhausted/);
+console.log("Pruebas del modelo ANODEFLEX: correctas");

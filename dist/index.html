@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#050a12">
+  <meta name="description" content="Cálculo y regulación de cuatro ramas ANODEFLEX en sistemas de protección catódica por corriente impresa.">
+  <title>ANODEFLEX · Regulación PC</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="apple-touch-icon" href="icon-192.svg">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark" aria-hidden="true">A</div>
+      <div><h1>ANODEFLEX <span>Control PC</span></h1><p>Red DC · dos nodos · cuatro ramas</p></div>
+    </div>
+    <div class="telemetry" aria-live="polite">
+      <div><span>I fuente</span><strong id="head-current">— A</strong></div>
+      <div><span>Potencia</span><strong id="head-power">— W</strong></div>
+      <div class="health"><span class="health-dot" id="health-dot"></span><strong id="health-label">Sin calibrar</strong></div>
+    </div>
+  </header>
+
+  <main>
+    <nav class="steps" aria-label="Secuencia de trabajo">
+      <button class="step active" data-scroll="calibration"><b>01</b><span>Mediciones<br><small>Calcular resistencias</small></span></button>
+      <button class="step" data-scroll="regulation"><b>02</b><span>Regulación<br><small>Ajustar reóstatos</small></span></button>
+      <button class="step" data-scroll="results"><b>03</b><span>Verificación<br><small>Balances y potencia</small></span></button>
+    </nav>
+
+    <section class="panel calibration" id="calibration">
+      <div class="section-heading">
+        <div><span class="eyebrow">CALIBRACIÓN DE CAMPO</span><h2>Resistencias fijas de las ramas</h2><p>Ingrese las mediciones tomadas con los cuatro reóstatos en 0 Ω.</p></div>
+        <button class="primary" id="calculate-fixed">Calcular y fijar resistencias</button>
+      </div>
+      <div class="input-grid calibration-grid">
+        <label>Voltaje del rectificador <span>V</span><input id="nom-v" type="number" min="0.001" step="0.1" value="24"></label>
+        <label>Resistencia de cable Rc1 <span>Ω</span><input id="rc1" type="number" min="0" step="0.001" value="0.4"></label>
+        <label>Resistencia de cable Rc2 <span>Ω</span><input id="rc2" type="number" min="0" step="0.001" value="0.5"></label>
+        <label class="b11">Corriente medida I11 <span>A</span><input id="nom-i11" type="number" min="0.001" step="0.01" value="1.2"></label>
+        <label class="b12">Corriente medida I12 <span>A</span><input id="nom-i12" type="number" min="0.001" step="0.01" value="1.0"></label>
+        <label class="b21">Corriente medida I21 <span>A</span><input id="nom-i21" type="number" min="0.001" step="0.01" value="0.9"></label>
+        <label class="b22">Corriente medida I22 <span>A</span><input id="nom-i22" type="number" min="0.001" step="0.01" value="0.8"></label>
+      </div>
+      <div class="fixed-strip" aria-live="polite">
+        <div><span>R11</span><strong id="fixed-r11">— Ω</strong></div><div><span>R12</span><strong id="fixed-r12">— Ω</strong></div>
+        <div><span>R21</span><strong id="fixed-r21">— Ω</strong></div><div><span>R22</span><strong id="fixed-r22">— Ω</strong></div>
+        <div class="nodes"><span>V1 / V2</span><strong id="fixed-nodes">— / — V</strong></div>
+      </div>
+      <div id="message" class="message" role="status" aria-live="polite"></div>
+      <details class="method">
+        <summary>Ver secuencia y ecuaciones de calibración</summary>
+        <div class="formula-grid">
+          <p><span>1 · Corrientes</span><code>I<sub>T</sub> = I11 + I12 + I21 + I22</code><code>I<sub>2</sub> = I21 + I22</code></p>
+          <p><span>2 · Nodos</span><code>V1 = V − I<sub>T</sub>·Rc1</code><code>V2 = V1 − I<sub>2</sub>·Rc2</code></p>
+          <p><span>3 · Resistencias</span><code>R11 = V1/I11 · R12 = V1/I12</code><code>R21 = V2/I21 · R22 = V2/I22</code></p>
+        </div>
+      </details>
+    </section>
+
+    <section class="workbench" id="regulation">
+      <article class="panel source-card">
+        <div class="section-heading compact"><div><span class="eyebrow">SIMULACIÓN OPERATIVA</span><h2>Tensión de trabajo</h2></div><output id="live-v-out">24.00 V</output></div>
+        <div class="control-row"><input id="live-v-range" type="range" min="0" max="100" step="0.1" value="24"><label>Valor<input id="live-v" type="number" min="0" max="1000" step="0.1" value="24"><span>V</span></label></div>
+        <div class="operator-bar">
+          <label>Reóstato máximo<input id="reo-max" type="number" min="0.01" step="1" value="100"><span>Ω</span></label>
+          <label>Tolerancia<input id="tolerance" type="number" min="0.01" max="100" step="0.1" value="2"><span>%</span></label>
+          <button class="primary" id="assist">Calcular ajuste de reóstatos</button>
+          <button class="secondary" id="save-case">Exportar caso</button>
+          <button class="secondary" id="load-case">Importar caso</button>
+          <button class="secondary" id="print-report">Imprimir informe</button>
+          <button class="secondary install" id="install-app" hidden>Instalar aplicación</button>
+          <input id="case-file" type="file" accept="application/json,.json" hidden>
+        </div>
+      </article>
+
+      <div class="branches" id="branch-cards"></div>
+    </section>
+
+    <section class="panel circuit-panel" aria-labelledby="circuit-title">
+      <div class="section-heading compact"><div><span class="eyebrow">ESQUEMA EN VIVO</span><h2 id="circuit-title">Distribución eléctrica</h2></div><div class="node-pills"><span>V1 <b id="node-v1">— V</b></span><span>V2 <b id="node-v2">— V</b></span></div></div>
+      <div class="circuit-wrap">
+        <svg id="circuit" viewBox="0 0 1080 360" role="img" aria-label="Circuito con fuente, dos cables y cuatro ramas ANODEFLEX">
+          <defs><marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="currentColor"/></marker></defs>
+          <path class="wire main" d="M85 75H970M85 295H970"/><path class="wire cable" d="M85 295H330M585 295H790"/>
+          <path class="battery" d="M85 75V142M55 142H115M65 163H105M75 184H95M85 184V295"/>
+          <text x="28" y="120" class="svg-main">V</text><text x="145" y="326" class="svg-muted">Rc1</text><text x="650" y="326" class="svg-muted">Rc2</text>
+          <g id="svg-branches"></g>
+          <text x="300" y="55" class="svg-node">NODO 1</text><text x="800" y="55" class="svg-node">NODO 2</text>
+        </svg>
+      </div>
+    </section>
+
+    <section class="panel" id="results">
+      <div class="section-heading compact"><div><span class="eyebrow">VERIFICACIÓN</span><h2>Resultados y balances</h2></div><button class="secondary" id="reset-rheostats">Reóstatos a 0 Ω</button></div>
+      <div class="result-grid">
+        <div><span>Corriente total</span><strong id="res-it">— A</strong></div><div><span>Tramo Rc2</span><strong id="res-i2">— A</strong></div>
+        <div><span>Caída en Rc1</span><strong id="res-dv1">— V</strong></div><div><span>Caída en Rc2</span><strong id="res-dv2">— V</strong></div>
+        <div><span>Potencia fuente</span><strong id="res-ps">— W</strong></div><div><span>Error de potencia</span><strong id="res-pe">— W</strong></div>
+      </div>
+      <div class="table-wrap"><table><thead><tr><th>Rama</th><th>Corriente</th><th>Objetivo</th><th>Desviación</th><th>R fija</th><th>Reóstato</th><th>Potencia rama</th></tr></thead><tbody id="results-body"></tbody></table></div>
+      <details class="method">
+        <summary>Ver comprobaciones del modelo</summary>
+        <div class="checks" id="checks"></div>
+      </details>
+    </section>
+  </main>
+
+  <dialog id="confirm-dialog"><form method="dialog"><h2>Recalcular resistencias fijas</h2><p>Los valores fijos actuales serán reemplazados por las mediciones visibles.</p><div><button value="cancel" class="secondary">Cancelar</button><button value="confirm" class="primary">Recalcular</button></div></form></dialog>
+  <script src="model.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

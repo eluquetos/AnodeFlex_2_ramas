@@ -1,0 +1,14 @@
+const assert=require("node:assert/strict");
+const fs=require("node:fs");
+const path=require("node:path");
+const root=path.resolve(__dirname,"../dist");
+const html=fs.readFileSync(path.join(root,"index.html"),"utf8");
+for(const file of ["styles.css","model.js","app.js","manifest.webmanifest","favicon.svg","icon-192.svg","icon-512.svg","sw.js"])assert.ok(fs.existsSync(path.join(root,file)),`${file} ausente`);
+for(const id of ["nom-i11","nom-i12","nom-i21","nom-i22","assist","calculate-fixed"])assert.ok(html.includes(`id="${id}"`),`${id} ausente`);
+const app=fs.readFileSync(path.join(root,"app.js"),"utf8");
+assert.ok(app.includes('const ids=["11","12","21","22"]'));
+assert.ok(app.includes('id="reo-${id}"'));
+const manifest=JSON.parse(fs.readFileSync(path.join(root,"manifest.webmanifest"),"utf8"));
+assert.equal(manifest.display,"standalone");
+assert.equal(manifest.start_url,"./");
+console.log("Pruebas de la aplicación estática: correctas");

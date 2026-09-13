@@ -8,6 +8,7 @@ for(const id of ["nom-i11","nom-i12","nom-i21","nom-i22","assist","calculate-fix
 assert.ok(!html.includes("<svg"),"el esquema en vivo no debe mostrarse");
 assert.ok(!html.includes('type="range"'),"no debe haber reglas deslizantes");
 const app=fs.readFileSync(path.join(root,"app.js"),"utf8");
+const css=fs.readFileSync(path.join(root,"styles.css"),"utf8");
 assert.ok(app.includes('const ids=["11","12","21","22"]'));
 assert.ok(app.includes('id="reo-${id}"'));
 assert.ok(!app.includes("data-set-reo"),"no debe haber botones de valores rápidos");
@@ -16,6 +17,7 @@ assert.ok(!app.includes("% del objetivo"),"la desviación no debe mostrarse en l
 assert.ok(app.includes("Resistencia del Sistema R${id}"),"debe identificar la resistencia del sistema");
 assert.ok(app.includes('id="reo-power-${id}"'),"debe mostrar la potencia de cada reóstato");
 assert.ok(app.includes("o.currents[id]**2*o.rheostats[id]"),"debe calcular P=I²·Reo");
+assert.ok(css.includes(".more-actions{position:static;grid-column:1/-1;width:100%}"),"Más opciones debe desplegarse dentro del panel visible");
 const manifest=JSON.parse(fs.readFileSync(path.join(root,"manifest.webmanifest"),"utf8"));
 assert.equal(manifest.display,"standalone");
 assert.equal(manifest.start_url,"./");

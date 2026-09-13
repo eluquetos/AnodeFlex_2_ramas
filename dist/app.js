@@ -11,9 +11,9 @@ function buildBranches(){
       <div class="branch-head"><div><span>NODO ${id[0]}</span><h3>RAMA ${id}</h3></div><div class="amp" id="amp-${id}">— A</div></div>
       <div class="branch-inputs">
         <label>Corriente objetivo<input id="target-${id}" type="number" min="0.001" step="0.01" value="${defaults[id]}"><em>A</em></label>
-        <label>Reóstato Reo${id}<input id="reo-${id}" type="number" min="0" max="10000" step="0.01" value="0"><em>Ω</em></label>
+        <div class="input-block"><label>Reóstato Reo${id}<input id="reo-${id}" type="number" min="0" max="10000" step="0.01" value="0"><em>Ω</em></label><div class="rheo-power"><span>Potencia del reóstato</span><strong id="reo-power-${id}">0,00 W</strong></div></div>
       </div>
-      <div class="fixed-note"><span>Resistencia fija R${id}</span><strong id="show-r-${id}">— Ω</strong></div>
+      <div class="fixed-note"><span>Resistencia del Sistema R${id}</span><strong id="show-r-${id}">— Ω</strong></div>
     </article>`).join("");
 }
 
@@ -30,7 +30,7 @@ function computeFixed(force=false){
   catch(error){showMessage(error.message==="voltage-exhausted"?"Las caídas en los cables consumen la tensión disponible. Reduzca corrientes o resistencias de cable, o aumente el voltaje.":"No se pudo obtener un conjunto físico de resistencias.","error");return}
   const {It,I2,V1,V2,fixed}=result;
   state.fixed=fixed;state.nominal={V,Rc1,Rc2,curr,V1,V2,It,I2};
-  ids.forEach(id=>{$(`fixed-r${id}`).textContent=`${fmt(fixed[id])} Ω`;$(`show-r-${id}`).textContent=`${fmt(fixed[id])} Ω`;$(`target-${id}`).value=curr[id]});
+  ids.forEach(id=>{$(`fixed-r${id}`).textContent=`${fmt(fixed[id],2)} Ω`;$(`show-r-${id}`).textContent=`${fmt(fixed[id],2)} Ω`;$(`target-${id}`).value=curr[id]});
   $("fixed-nodes").textContent=`${fmt(V1,2)} / ${fmt(V2,2)} V`;$("live-v").value=V;
   localStorage.setItem("anodeflex-fixed",JSON.stringify({fixed,stateNominal:state.nominal}));
   showMessage("Resistencias calculadas y fijadas. Ya puede regular el voltaje y los reóstatos.","success");solve();
@@ -46,10 +46,10 @@ function solve(){
 function render(){
   const o=state.op,tolerance=Math.max(.01,n("tolerance")||2);let allWithin=true;
   $("live-v-out").textContent=`${fmt(o.V,2)} V`;$("head-current").textContent=`${fmt(o.It)} A`;$("health-dot").className="health-dot ok";
-  ids.forEach(id=>{const target=n(`target-${id}`),delta=o.currents[id]-target,pct=target>0?100*delta/target:NaN,within=Number.isFinite(pct)&&Math.abs(pct)<=tolerance;allWithin&&=within;$(`amp-${id}`).textContent=`${fmt(o.currents[id])} A`});
+  ids.forEach(id=>{const target=n(`target-${id}`),delta=o.currents[id]-target,pct=target>0?100*delta/target:NaN,within=Number.isFinite(pct)&&Math.abs(pct)<=tolerance;allWithin&&=within;$(`amp-${id}`).textContent=`${fmt(o.currents[id])} A`;$(`reo-power-${id}`).textContent=`${fmt(o.currents[id]**2*o.rheostats[id],2)} W`});
   $("health-label").textContent=allWithin?"Objetivos cumplidos":"Simulación válida";
   $("res-it").textContent=`${fmt(o.It)} A`;$("res-i2").textContent=`${fmt(o.I2)} A`;$("res-dv1").textContent=`${fmt(o.It*o.Rc1,3)} V`;$("res-dv2").textContent=`${fmt(o.I2*o.Rc2,3)} V`;$("res-ps").textContent=`${fmt(o.pSource,2)} W`;$("res-pe").textContent=`${fmt(o.pError,6)} W`;
-  $("results-body").innerHTML=ids.map(id=>{const target=n(`target-${id}`),delta=o.currents[id]-target,pct=target>0?100*delta/target:NaN,power=o.currents[id]**2*o.branch[id];return `<tr><td>I${id}</td><td>${fmt(o.currents[id])} A</td><td>${fmt(target)} A</td><td class="${Math.abs(pct)<=tolerance?"status-ok":"status-warn"}">${Number.isFinite(pct)?fmt(pct,2)+" %":"—"}</td><td>${fmt(state.fixed[id])} Ω</td><td>${fmt(o.rheostats[id])} Ω</td><td>${fmt(power,2)} W</td></tr>`}).join("");
+  $("results-body").innerHTML=ids.map(id=>{const target=n(`target-${id}`),delta=o.currents[id]-target,pct=target>0?100*delta/target:NaN,power=o.currents[id]**2*o.branch[id];return `<tr><td>I${id}</td><td>${fmt(o.currents[id])} A</td><td>${fmt(target)} A</td><td class="${Math.abs(pct)<=tolerance?"status-ok":"status-warn"}">${Number.isFinite(pct)?fmt(pct,2)+" %":"—"}</td><td>${fmt(state.fixed[id],2)} Ω</td><td>${fmt(o.rheostats[id])} Ω</td><td>${fmt(power,2)} W</td></tr>`}).join("");
   const errors={"KCL nodo 1":o.It-o.currents["11"]-o.currents["12"]-o.I2,"KCL nodo 2":o.I2-o.currents["21"]-o.currents["22"],"KVL fuente–nodo 1":o.V-o.V1-o.It*o.Rc1,"KVL nodo 1–nodo 2":o.V1-o.V2-o.I2*o.Rc2,"Balance de potencia":o.pError};
   $("checks").innerHTML=Object.entries(errors).map(([label,value])=>`<p><span>${label}</span><b>${fmt(value,8)}</b></p>`).join("");
 }
@@ -73,7 +73,7 @@ function saveCase(){if(!state.op)return;const blob=new Blob([JSON.stringify(case
 
 function loadCase(file){
   const reader=new FileReader();
-  reader.onload=()=>{try{const data=JSON.parse(reader.result);if(data.format!=="anodeflex-pc-case"||!data.calibration?.fixed||!data.operation)throw new Error();state.fixed=data.calibration.fixed;state.nominal={V:data.calibration.V,Rc1:data.calibration.Rc1,Rc2:data.calibration.Rc2,curr:data.calibration.currents};const currents=data.calibration.currents;state.nominal.It=Object.values(currents).reduce((sum,value)=>sum+value,0);state.nominal.I2=currents["21"]+currents["22"];state.nominal.V1=state.nominal.V-state.nominal.It*state.nominal.Rc1;state.nominal.V2=state.nominal.V1-state.nominal.I2*state.nominal.Rc2;$("nom-v").value=state.nominal.V;$("rc1").value=state.nominal.Rc1;$("rc2").value=state.nominal.Rc2;ids.forEach(id=>{$(`nom-i${id}`).value=currents[id];$(`fixed-r${id}`).textContent=`${fmt(state.fixed[id])} Ω`;$(`show-r-${id}`).textContent=`${fmt(state.fixed[id])} Ω`;$(`target-${id}`).value=data.operation.targets[id];setRheostat(id,data.operation.rheostats[id])});$("fixed-nodes").textContent=`${fmt(state.nominal.V1,2)} / ${fmt(state.nominal.V2,2)} V`;$("live-v").value=data.operation.V;$("reo-max").value=data.operation.rheostatMax||100;$("tolerance").value=data.operation.tolerancePercent||2;localStorage.setItem("anodeflex-fixed",JSON.stringify({fixed:state.fixed,stateNominal:state.nominal}));solve();showMessage("Caso importado y recalculado correctamente.","success")}catch{showMessage("El archivo no corresponde a un caso ANODEFLEX válido.","error")}};
+  reader.onload=()=>{try{const data=JSON.parse(reader.result);if(data.format!=="anodeflex-pc-case"||!data.calibration?.fixed||!data.operation)throw new Error();state.fixed=data.calibration.fixed;state.nominal={V:data.calibration.V,Rc1:data.calibration.Rc1,Rc2:data.calibration.Rc2,curr:data.calibration.currents};const currents=data.calibration.currents;state.nominal.It=Object.values(currents).reduce((sum,value)=>sum+value,0);state.nominal.I2=currents["21"]+currents["22"];state.nominal.V1=state.nominal.V-state.nominal.It*state.nominal.Rc1;state.nominal.V2=state.nominal.V1-state.nominal.I2*state.nominal.Rc2;$("nom-v").value=state.nominal.V;$("rc1").value=state.nominal.Rc1;$("rc2").value=state.nominal.Rc2;ids.forEach(id=>{$(`nom-i${id}`).value=currents[id];$(`fixed-r${id}`).textContent=`${fmt(state.fixed[id],2)} Ω`;$(`show-r-${id}`).textContent=`${fmt(state.fixed[id],2)} Ω`;$(`target-${id}`).value=data.operation.targets[id];setRheostat(id,data.operation.rheostats[id])});$("fixed-nodes").textContent=`${fmt(state.nominal.V1,2)} / ${fmt(state.nominal.V2,2)} V`;$("live-v").value=data.operation.V;$("reo-max").value=data.operation.rheostatMax||100;$("tolerance").value=data.operation.tolerancePercent||2;localStorage.setItem("anodeflex-fixed",JSON.stringify({fixed:state.fixed,stateNominal:state.nominal}));solve();showMessage("Caso importado y recalculado correctamente.","success")}catch{showMessage("El archivo no corresponde a un caso ANODEFLEX válido.","error")}};
   reader.readAsText(file);
 }
 
@@ -85,7 +85,7 @@ function wireEvents(){
   $("reset-rheostats").addEventListener("click",()=>{ids.forEach(id=>setRheostat(id,0));solve()});$("assist").addEventListener("click",assistedAdjustment);$("tolerance").addEventListener("input",solve);$("save-case").addEventListener("click",saveCase);$("load-case").addEventListener("click",()=>$("case-file").click());$("case-file").addEventListener("change",event=>{if(event.target.files[0])loadCase(event.target.files[0]);event.target.value=""});$("print-report").addEventListener("click",()=>window.print());
 }
 
-function restore(){try{const saved=JSON.parse(localStorage.getItem("anodeflex-fixed"));if(saved?.fixed&&saved?.stateNominal){state.fixed=saved.fixed;state.nominal=saved.stateNominal;ids.forEach(id=>{$(`fixed-r${id}`).textContent=`${fmt(state.fixed[id])} Ω`;$(`show-r-${id}`).textContent=`${fmt(state.fixed[id])} Ω`});$("fixed-nodes").textContent=`${fmt(state.nominal.V1,2)} / ${fmt(state.nominal.V2,2)} V`;solve();return}}catch{}computeFixed(true)}
+function restore(){try{const saved=JSON.parse(localStorage.getItem("anodeflex-fixed"));if(saved?.fixed&&saved?.stateNominal){state.fixed=saved.fixed;state.nominal=saved.stateNominal;ids.forEach(id=>{$(`fixed-r${id}`).textContent=`${fmt(state.fixed[id],2)} Ω`;$(`show-r-${id}`).textContent=`${fmt(state.fixed[id],2)} Ω`});$("fixed-nodes").textContent=`${fmt(state.nominal.V1,2)} / ${fmt(state.nominal.V2,2)} V`;solve();return}}catch{}computeFixed(true)}
 
 let installPrompt=null;
 window.addEventListener("beforeinstallprompt",event=>{event.preventDefault();installPrompt=event;$("install-app").hidden=false});

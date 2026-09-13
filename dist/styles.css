@@ -246,6 +246,17 @@ button:focus-visible,summary:focus-visible{outline:3px solid var(--blue);outline
 .status-ok{color:var(--green)}
 .status-warn{color:var(--amber)}
 .branch-inputs{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:20px}
+.input-block{display:grid;gap:8px}
+.rheo-power{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  padding:0 3px;
+  color:var(--muted);
+  font-size:.75rem;
+}
+.rheo-power strong{color:var(--accent);font-size:.8rem;font-weight:700;font-variant-numeric:tabular-nums}
 .fixed-note{
   display:flex;
   align-items:center;

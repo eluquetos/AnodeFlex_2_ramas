@@ -224,39 +224,39 @@ button:focus-visible,summary:focus-visible{outline:3px solid var(--blue);outline
 .branch-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
 .branch-head span{
   color:var(--text);
-  font-size:1.1rem;
+  font-size:.98rem;
   font-weight:750;
   letter-spacing:-.025em;
 }
 .branch-head h3{
   margin:3px 0 0;
   color:var(--muted);
-  font-size:.8rem;
+  font-size:.72rem;
   font-weight:650;
   letter-spacing:.045em;
 }
 .amp{
   margin:0;
   color:var(--accent);
-  font-size:clamp(1.25rem,2vw,1.65rem);
+  font-size:clamp(1.15rem,1.7vw,1.45rem);
   font-weight:750;
   letter-spacing:-.035em;
   font-variant-numeric:tabular-nums;
 }
 .status-ok{color:var(--green)}
 .status-warn{color:var(--amber)}
-.branch-inputs{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:20px}
-.input-block{display:grid;gap:8px}
-.rheo-power{
+.branch-inputs{display:grid;grid-template-columns:1fr 1fr;align-items:start;gap:9px;margin-top:16px}
+.branch-inputs>label{font-size:.78rem}
+.input-title{
   display:flex;
   align-items:center;
   justify-content:space-between;
-  gap:8px;
-  padding:0 3px;
-  color:var(--muted);
-  font-size:.75rem;
+  gap:6px;
+  min-height:1rem;
+  color:#b7b7bd;
+  line-height:1;
 }
-.rheo-power strong{color:var(--accent);font-size:.8rem;font-weight:700;font-variant-numeric:tabular-nums}
+.input-title strong{color:var(--accent);font-size:.72rem;font-weight:700;white-space:nowrap;font-variant-numeric:tabular-nums}
 .fixed-note{
   display:flex;
   align-items:center;

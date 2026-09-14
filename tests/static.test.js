@@ -17,6 +17,11 @@ assert.ok(!app.includes("% del objetivo"),"la desviación no debe mostrarse en l
 assert.ok(app.includes("Resistencia del Sistema R${id}"),"debe identificar la resistencia del sistema");
 assert.ok(app.includes('id="reo-power-${id}"'),"debe mostrar la potencia de cada reóstato");
 assert.ok(app.includes("o.currents[id]**2*o.rheostats[id]"),"debe calcular P=I²·Reo");
+assert.ok(app.includes('<span class="input-title">Corriente</span>'),"debe usar el título Corriente");
+assert.ok(app.includes('>0.00 W</strong>'),"debe mostrar la potencia junto a ReoXX");
+assert.ok(app.includes("value.toFixed(2)"),"la potencia debe mostrar dos decimales con punto");
+assert.ok(!app.includes("Corriente objetivo"),"debe eliminar el título anterior de corriente");
+assert.ok(!app.includes("Potencia del reóstato"),"debe eliminar la fila separada de potencia");
 assert.ok(css.includes(".more-actions{position:static;grid-column:1/-1;width:100%}"),"Más opciones debe desplegarse dentro del panel visible");
 const manifest=JSON.parse(fs.readFileSync(path.join(root,"manifest.webmanifest"),"utf8"));
 assert.equal(manifest.display,"standalone");

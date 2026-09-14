@@ -3,6 +3,7 @@ const state={fixed:null,nominal:null,op:null};
 const $=id=>document.getElementById(id);
 const n=id=>Number($(id).value);
 const fmt=(value,digits=3)=>Number.isFinite(value)?value.toLocaleString("es-EC",{minimumFractionDigits:digits,maximumFractionDigits:digits}):"—";
+const powerFmt=value=>Number.isFinite(value)?value.toFixed(2):"—";
 
 function buildBranches(){
   const defaults={"11":1.2,"12":1,"21":.9,"22":.8};
@@ -10,8 +11,8 @@ function buildBranches(){
     <article class="panel branch tone-${id}" data-id="${id}">
       <div class="branch-head"><div><span>NODO ${id[0]}</span><h3>RAMA ${id}</h3></div><div class="amp" id="amp-${id}">— A</div></div>
       <div class="branch-inputs">
-        <label>Corriente objetivo<input id="target-${id}" type="number" min="0.001" step="0.01" value="${defaults[id]}"><em>A</em></label>
-        <div class="input-block"><label>Reóstato Reo${id}<input id="reo-${id}" type="number" min="0" max="10000" step="0.01" value="0"><em>Ω</em></label><div class="rheo-power"><span>Potencia del reóstato</span><strong id="reo-power-${id}">0,00 W</strong></div></div>
+        <label><span class="input-title">Corriente</span><input id="target-${id}" type="number" min="0.001" step="0.01" value="${defaults[id]}"><em>A</em></label>
+        <label><span class="input-title"><span>Reo${id}</span><strong id="reo-power-${id}">0.00 W</strong></span><input id="reo-${id}" type="number" min="0" max="10000" step="0.01" value="0"><em>Ω</em></label>
       </div>
       <div class="fixed-note"><span>Resistencia del Sistema R${id}</span><strong id="show-r-${id}">— Ω</strong></div>
     </article>`).join("");
@@ -46,7 +47,7 @@ function solve(){
 function render(){
   const o=state.op,tolerance=Math.max(.01,n("tolerance")||2);let allWithin=true;
   $("live-v-out").textContent=`${fmt(o.V,2)} V`;$("head-current").textContent=`${fmt(o.It)} A`;$("health-dot").className="health-dot ok";
-  ids.forEach(id=>{const target=n(`target-${id}`),delta=o.currents[id]-target,pct=target>0?100*delta/target:NaN,within=Number.isFinite(pct)&&Math.abs(pct)<=tolerance;allWithin&&=within;$(`amp-${id}`).textContent=`${fmt(o.currents[id])} A`;$(`reo-power-${id}`).textContent=`${fmt(o.currents[id]**2*o.rheostats[id],2)} W`});
+  ids.forEach(id=>{const target=n(`target-${id}`),delta=o.currents[id]-target,pct=target>0?100*delta/target:NaN,within=Number.isFinite(pct)&&Math.abs(pct)<=tolerance;allWithin&&=within;$(`amp-${id}`).textContent=`${fmt(o.currents[id])} A`;$(`reo-power-${id}`).textContent=`${powerFmt(o.currents[id]**2*o.rheostats[id])} W`});
   $("health-label").textContent=allWithin?"Objetivos cumplidos":"Simulación válida";
   $("res-it").textContent=`${fmt(o.It)} A`;$("res-i2").textContent=`${fmt(o.I2)} A`;$("res-dv1").textContent=`${fmt(o.It*o.Rc1,3)} V`;$("res-dv2").textContent=`${fmt(o.I2*o.Rc2,3)} V`;$("res-ps").textContent=`${fmt(o.pSource,2)} W`;$("res-pe").textContent=`${fmt(o.pError,6)} W`;
   $("results-body").innerHTML=ids.map(id=>{const target=n(`target-${id}`),delta=o.currents[id]-target,pct=target>0?100*delta/target:NaN,power=o.currents[id]**2*o.branch[id];return `<tr><td>I${id}</td><td>${fmt(o.currents[id])} A</td><td>${fmt(target)} A</td><td class="${Math.abs(pct)<=tolerance?"status-ok":"status-warn"}">${Number.isFinite(pct)?fmt(pct,2)+" %":"—"}</td><td>${fmt(state.fixed[id],2)} Ω</td><td>${fmt(o.rheostats[id])} Ω</td><td>${fmt(power,2)} W</td></tr>`}).join("");

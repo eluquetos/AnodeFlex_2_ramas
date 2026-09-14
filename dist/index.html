@@ -29,9 +29,9 @@
         <div><div class="step-label"><span class="step-number">1</span><span>MEDICIONES DE CAMPO</span></div><h2>Calcular resistencias fijas</h2><p>Valores medidos con los reóstatos en 0 Ω.</p></div>
       </div>
       <div class="field-grid calibration-fields">
-        <label>Voltaje<input id="nom-v" type="number" min="0.001" step="0.1" value="24"><em>V</em></label>
-        <label>Rc1<input id="rc1" type="number" min="0" step="0.001" value="0.4"><em>Ω</em></label>
-        <label>Rc2<input id="rc2" type="number" min="0" step="0.001" value="0.5"><em>Ω</em></label>
+        <label>Voltaje<input id="nom-v" type="number" min="0.001" step="0.01" value="24"><em>V</em></label>
+        <label>Rc1<input id="rc1" type="number" min="0" step="0.01" value="0.4"><em>Ω</em></label>
+        <label>Rc2<input id="rc2" type="number" min="0" step="0.01" value="0.5"><em>Ω</em></label>
         <label class="tone-11">Corriente I11<input id="nom-i11" type="number" min="0.001" step="0.01" value="1.2"><em>A</em></label>
         <label class="tone-12">Corriente I12<input id="nom-i12" type="number" min="0.001" step="0.01" value="1.0"><em>A</em></label>
         <label class="tone-21">Corriente I21<input id="nom-i21" type="number" min="0.001" step="0.01" value="0.9"><em>A</em></label>
@@ -55,7 +55,7 @@
         <div class="section-title">
           <div><div class="step-label"><span class="step-number">2</span><span>REGULACIÓN</span></div><h2>Ajustar corrientes</h2><p>Escriba el voltaje, la corriente objetivo y cada reóstato.</p></div>
         </div>
-        <div class="voltage-control"><label>Voltaje de trabajo<input id="live-v" type="number" min="0" max="1000" step="0.1" value="24"><em>V</em></label><output id="live-v-out">24,00 V</output></div>
+        <div class="voltage-control"><label>Voltaje de trabajo<input id="live-v" type="number" min="0" max="1000" step="0.01" value="24"><em>V</em></label><output id="live-v-out">24,00 V</output></div>
       </div>
 
       <div class="branches" id="branch-cards"></div>

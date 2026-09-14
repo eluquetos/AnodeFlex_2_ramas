@@ -5,6 +5,9 @@ const root=path.resolve(__dirname,"../dist");
 const html=fs.readFileSync(path.join(root,"index.html"),"utf8");
 for(const file of ["styles.css","model.js","app.js","manifest.webmanifest","favicon.svg","icon-192.svg","icon-512.svg","sw.js"])assert.ok(fs.existsSync(path.join(root,file)),`${file} ausente`);
 for(const id of ["nom-i11","nom-i12","nom-i21","nom-i22","assist","calculate-fixed"])assert.ok(html.includes(`id="${id}"`),`${id} ausente`);
+for(const id of ["nom-v","rc1","rc2","nom-i11","nom-i12","nom-i21","nom-i22","live-v"]){
+  assert.match(html,new RegExp(`id="${id}"[^>]*step="0\\.01"`),`${id} debe variar en centésimas`);
+}
 assert.ok(!html.includes("<svg"),"el esquema en vivo no debe mostrarse");
 assert.ok(!html.includes('type="range"'),"no debe haber reglas deslizantes");
 const app=fs.readFileSync(path.join(root,"app.js"),"utf8");

@@ -34,7 +34,7 @@ function computeFixed(force=false){
   state.fixed=fixed;state.nominal={V,Rc1,Rc2,curr,V1,V2,It,I2};
   ids.forEach(id=>{$(`fixed-r${id}`).textContent=`${fmt(fixed[id],2)} Ω`;$(`system-r-${id}`).value=Number(fixed[id]).toFixed(2);$(`target-${id}`).value=curr[id]});
   $("fixed-nodes").textContent=`${fmt(V1,2)} / ${fmt(V2,2)} V`;$("live-v").value=V;
-  localStorage.setItem("anodeflex-fixed",JSON.stringify({fixed,stateNominal:state.nominal}));
+  localStorage.setItem("anodeflex-2-ramas-1iny-fixed",JSON.stringify({fixed,stateNominal:state.nominal}));
   showMessage("Resistencias calculadas y fijadas. Ya puede regular el voltaje y los reóstatos.","success");solve();
 }
 
@@ -46,7 +46,7 @@ function solve(){
   const V=n("live-v"),reo=Object.fromEntries(ids.map(id=>[id,Math.max(0,n(`reo-${id}`)||0)]));
   try{state.op=AnodeflexModel.simulate({V,Rc1:state.nominal.Rc1,Rc2:state.nominal.Rc2,fixed:state.fixed,rheostats:reo});render()}
   catch{showMessage("La simulación contiene un valor no válido.","error")}
-  localStorage.setItem("anodeflex-fixed",JSON.stringify({fixed:state.fixed,stateNominal:state.nominal}));
+  localStorage.setItem("anodeflex-2-ramas-1iny-fixed",JSON.stringify({fixed:state.fixed,stateNominal:state.nominal}));
 }
 
 function render(){
@@ -75,11 +75,11 @@ function assistedAdjustment(){
 }
 
 function caseData(){return {format:"anodeflex-pc-case",version:1,createdAt:new Date().toISOString(),calibration:{V:state.nominal.V,Rc1:state.nominal.Rc1,Rc2:state.nominal.Rc2,currents:state.nominal.curr,fixed:state.fixed},operation:{V:n("live-v"),targets:Object.fromEntries(ids.map(id=>[id,n(`target-${id}`)])),rheostats:Object.fromEntries(ids.map(id=>[id,n(`reo-${id}`)])),rheostatMax:n("reo-max"),tolerancePercent:n("tolerance")},results:state.op}}
-function saveCase(){if(!state.op)return;const blob=new Blob([JSON.stringify(caseData(),null,2)],{type:"application/json"}),url=URL.createObjectURL(blob),link=document.createElement("a");link.href=url;link.download=`anodeflex-${new Date().toISOString().slice(0,10)}.json`;link.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}
+function saveCase(){if(!state.op)return;const blob=new Blob([JSON.stringify(caseData(),null,2)],{type:"application/json"}),url=URL.createObjectURL(blob),link=document.createElement("a");link.href=url;link.download=`anodeflex-2-ramas-1iny-${new Date().toISOString().slice(0,10)}.json`;link.click();setTimeout(()=>URL.revokeObjectURL(url),1000)}
 
 function loadCase(file){
   const reader=new FileReader();
-  reader.onload=()=>{try{const data=JSON.parse(reader.result);if(data.format!=="anodeflex-pc-case"||!data.calibration?.fixed||!data.operation)throw new Error();state.fixed=data.calibration.fixed;state.nominal={V:data.calibration.V,Rc1:data.calibration.Rc1,Rc2:data.calibration.Rc2,curr:data.calibration.currents};const currents=data.calibration.currents;state.nominal.It=Object.values(currents).reduce((sum,value)=>sum+value,0);state.nominal.I2=currents["21"]+currents["22"];state.nominal.V1=state.nominal.V-state.nominal.It*state.nominal.Rc1;state.nominal.V2=state.nominal.V1-state.nominal.I2*state.nominal.Rc2;$("nom-v").value=state.nominal.V;$("rc1").value=state.nominal.Rc1;$("rc2").value=state.nominal.Rc2;ids.forEach(id=>{$(`nom-i${id}`).value=currents[id];$(`fixed-r${id}`).textContent=`${fmt(state.fixed[id],2)} Ω`;$(`system-r-${id}`).value=Number(state.fixed[id]).toFixed(2);$(`target-${id}`).value=data.operation.targets[id];setRheostat(id,data.operation.rheostats[id])});$("fixed-nodes").textContent=`${fmt(state.nominal.V1,2)} / ${fmt(state.nominal.V2,2)} V`;$("live-v").value=data.operation.V;$("reo-max").value=data.operation.rheostatMax||100;$("tolerance").value=data.operation.tolerancePercent||2;localStorage.setItem("anodeflex-fixed",JSON.stringify({fixed:state.fixed,stateNominal:state.nominal}));solve();showMessage("Caso importado y recalculado correctamente.","success")}catch{showMessage("El archivo no corresponde a un caso ANODEFLEX válido.","error")}};
+  reader.onload=()=>{try{const data=JSON.parse(reader.result);if(data.format!=="anodeflex-pc-case"||!data.calibration?.fixed||!data.operation)throw new Error();state.fixed=data.calibration.fixed;state.nominal={V:data.calibration.V,Rc1:data.calibration.Rc1,Rc2:data.calibration.Rc2,curr:data.calibration.currents};const currents=data.calibration.currents;state.nominal.It=Object.values(currents).reduce((sum,value)=>sum+value,0);state.nominal.I2=currents["21"]+currents["22"];state.nominal.V1=state.nominal.V-state.nominal.It*state.nominal.Rc1;state.nominal.V2=state.nominal.V1-state.nominal.I2*state.nominal.Rc2;$("nom-v").value=state.nominal.V;$("rc1").value=state.nominal.Rc1;$("rc2").value=state.nominal.Rc2;ids.forEach(id=>{$(`nom-i${id}`).value=currents[id];$(`fixed-r${id}`).textContent=`${fmt(state.fixed[id],2)} Ω`;$(`system-r-${id}`).value=Number(state.fixed[id]).toFixed(2);$(`target-${id}`).value=data.operation.targets[id];setRheostat(id,data.operation.rheostats[id])});$("fixed-nodes").textContent=`${fmt(state.nominal.V1,2)} / ${fmt(state.nominal.V2,2)} V`;$("live-v").value=data.operation.V;$("reo-max").value=data.operation.rheostatMax||100;$("tolerance").value=data.operation.tolerancePercent||2;localStorage.setItem("anodeflex-2-ramas-1iny-fixed",JSON.stringify({fixed:state.fixed,stateNominal:state.nominal}));solve();showMessage("Caso importado y recalculado correctamente.","success")}catch{showMessage("El archivo no corresponde a un caso ANODEFLEX válido.","error")}};
   reader.readAsText(file);
 }
 
@@ -91,7 +91,7 @@ function wireEvents(){
   $("reset-rheostats").addEventListener("click",()=>{ids.forEach(id=>setRheostat(id,0));solve()});$("assist").addEventListener("click",assistedAdjustment);$("tolerance").addEventListener("input",solve);$("save-case").addEventListener("click",saveCase);$("load-case").addEventListener("click",()=>$("case-file").click());$("case-file").addEventListener("change",event=>{if(event.target.files[0])loadCase(event.target.files[0]);event.target.value=""});$("print-report").addEventListener("click",()=>window.print());
 }
 
-function restore(){try{const saved=JSON.parse(localStorage.getItem("anodeflex-fixed"));if(saved?.fixed&&saved?.stateNominal){state.fixed=saved.fixed;state.nominal=saved.stateNominal;ids.forEach(id=>{$(`fixed-r${id}`).textContent=`${fmt(state.fixed[id],2)} Ω`;$(`system-r-${id}`).value=Number(state.fixed[id]).toFixed(2)});$("fixed-nodes").textContent=`${fmt(state.nominal.V1,2)} / ${fmt(state.nominal.V2,2)} V`;solve();return}}catch{}computeFixed(true)}
+function restore(){try{const saved=JSON.parse(localStorage.getItem("anodeflex-2-ramas-1iny-fixed")||localStorage.getItem("anodeflex-fixed"));if(saved?.fixed&&saved?.stateNominal){state.fixed=saved.fixed;state.nominal=saved.stateNominal;ids.forEach(id=>{$(`fixed-r${id}`).textContent=`${fmt(state.fixed[id],2)} Ω`;$(`system-r-${id}`).value=Number(state.fixed[id]).toFixed(2)});$("fixed-nodes").textContent=`${fmt(state.nominal.V1,2)} / ${fmt(state.nominal.V2,2)} V`;localStorage.setItem("anodeflex-2-ramas-1iny-fixed",JSON.stringify({fixed:state.fixed,stateNominal:state.nominal}));solve();return}}catch{}computeFixed(true)}
 
 let installPrompt=null;
 window.addEventListener("beforeinstallprompt",event=>{event.preventDefault();installPrompt=event;$("install-app").hidden=false});

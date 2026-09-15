@@ -1,6 +1,6 @@
 {
-  "name": "ANODEFLEX Control PC",
-  "short_name": "ANODEFLEX PC",
+  "name": "ANODEFLEX 2 Ramas · 1 Inyección",
+  "short_name": "ANODEFLEX 2 1INY",
   "description": "Cálculo y regulación de redes ANODEFLEX por corriente impresa.",
   "start_url": "./",
   "display": "standalone",

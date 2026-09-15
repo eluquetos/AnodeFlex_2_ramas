@@ -31,4 +31,6 @@ assert.ok(css.includes(".more-actions{position:static;grid-column:1/-1;width:100
 const manifest=JSON.parse(fs.readFileSync(path.join(root,"manifest.webmanifest"),"utf8"));
 assert.equal(manifest.display,"standalone");
 assert.equal(manifest.start_url,"./");
+assert.equal(manifest.short_name,"ANODEFLEX 2 1INY");
+assert.ok(html.includes("2 ramas · 1 inyección"),"debe mostrar el nombre nuevo");
 console.log("Pruebas de la aplicación estática: correctas");

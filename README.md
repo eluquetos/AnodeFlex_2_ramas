@@ -1,4 +1,4 @@
-# ANODEFLEX Control PC
+# ANODEFLEX 2 ramas · 1 inyección
 
 Aplicación web instalable para dimensionar y regular cuatro ramas ANODEFLEX en una red de protección catódica por corriente impresa.
 

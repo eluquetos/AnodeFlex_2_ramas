@@ -8,6 +8,9 @@ const operating=model.simulate({V:24,Rc1:.4,Rc2:.5,fixed:nominal.fixed,rheostats
 for(const id of model.IDS)assert.ok(Math.abs(operating.currents[id]-currents[id])<1e-12,`corriente ${id}`);
 assert.ok(Math.abs(operating.It-3.9)<1e-12);
 assert.ok(Math.abs(operating.pError)<1e-10);
+const editedFixed={...nominal.fixed,11:nominal.fixed[11]+5};
+const editedOperating=model.simulate({V:24,Rc1:.4,Rc2:.5,fixed:editedFixed,rheostats:{11:0,12:0,21:0,22:0}});
+assert.ok(editedOperating.currents["11"]<operating.currents["11"],"al editar R11 debe recalcularse I11");
 const targets={11:1,12:.8,21:.7,22:.6};
 const adjustment=model.adjust({V:24,Rc1:.4,Rc2:.5,fixed:nominal.fixed,targets,maxReo:100});
 assert.equal(adjustment.feasible,true);

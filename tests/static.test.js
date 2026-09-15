@@ -14,6 +14,8 @@ const app=fs.readFileSync(path.join(root,"app.js"),"utf8");
 const css=fs.readFileSync(path.join(root,"styles.css"),"utf8");
 assert.ok(app.includes('const ids=["11","12","21","22"]'));
 assert.ok(app.includes('id="reo-${id}"'));
+assert.ok(app.includes('id="system-r-${id}"'),"cada resistencia del sistema debe ser editable");
+assert.ok(app.includes('$(`system-r-${id}`).addEventListener("input",solve)'),"editar una resistencia debe recalcular la simulación");
 assert.ok(!app.includes("data-set-reo"),"no debe haber botones de valores rápidos");
 assert.ok(!app.includes("reo-range"),"no debe haber reóstatos deslizantes");
 assert.ok(!app.includes("% del objetivo"),"la desviación no debe mostrarse en las tarjetas");

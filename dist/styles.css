@@ -268,7 +268,9 @@ button:focus-visible,summary:focus-visible{outline:3px solid var(--blue);outline
   color:var(--muted);
   font-size:.78rem;
 }
-.fixed-note strong{color:#d2d2d7;font-size:.8rem;font-weight:650;font-variant-numeric:tabular-nums}
+.fixed-control{display:block;flex:0 0 104px}
+.fixed-control input{height:38px;padding:0 27px 0 9px;border-radius:11px;text-align:right;font-size:.85rem}
+.fixed-control em{right:10px;bottom:11px}
 .action-bar{display:grid;grid-template-columns:minmax(220px,1fr) auto;align-items:start;gap:9px;margin-top:18px;padding-top:18px;border-top:1px solid #333}
 .action-bar>.primary{margin:0}
 .more-actions{position:static;grid-column:1/-1;width:100%}
